@@ -37,11 +37,30 @@ export async function proxyMpRequest(options: RequestOptions) {
         fetchInit.body = new URLSearchParams(options.body as Record<string, string>).toString()
     }
 
-    const response = fetch(options.endpoint, fetchInit)
+    const response = await fetch(options.endpoint, fetchInit)
+    console.log(options.endpoint);
+    // console.log(fetchInit);
+    
     if (!options.parseJson) {
-        return response
+        console.log(response);
+        
+        // 移除Secure属性
+        const headers = new Headers(response.headers)
+        const cookies = headers.get('set-cookie')
+        if (cookies) {
+            const newCookies = cookies.split(',').map(cookie => 
+                cookie.split(';').filter(attr => !attr.trim().toLowerCase().startsWith('secure')).join(';')
+            ).join(',')
+            headers.set('set-cookie', newCookies)
+        }
+        
+        return new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: headers
+        })
     } else {
-        return response.then(resp => resp.json())
+        return response.json()
     }
 }
 
