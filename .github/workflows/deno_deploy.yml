@@ -13,7 +13,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     permissions:
-      id-token: ddp_lpG5Qw0cIHIwKmVaUKfCtcQF4gtiOf1y9Ea4 # Needed for auth with Deno Deploy
+      id-token: write # Needed for auth with Deno Deploy
       contents: read # Needed to clone the repository
 
     steps:
