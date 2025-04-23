@@ -38,11 +38,8 @@ export async function proxyMpRequest(options: RequestOptions) {
     }
 
     const response = await fetch(options.endpoint, fetchInit)
-    console.log(options.endpoint);
-    // console.log(fetchInit);
     
     if (!options.parseJson) {
-        console.log(response);
         
         // 移除Secure属性
         const headers = new Headers(response.headers)
