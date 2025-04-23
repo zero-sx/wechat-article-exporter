@@ -43,12 +43,13 @@ export async function proxyMpRequest(options: RequestOptions) {
         
         // 移除Secure属性
         const headers = new Headers(response.headers)
-        const cookies = headers.get('set-cookie')
+        const cookies = response.headers.getSetCookie()
+        
         if (cookies) {
-            const newCookies = cookies.split(',').map(cookie => 
+            const newCookies = cookies.map(cookie => 
                 cookie.split(';').filter(attr => !attr.trim().toLowerCase().startsWith('secure')).join(';')
             ).join(',')
-            headers.set('set-cookie', newCookies)
+            headers.append('set-cookie', newCookies)
         }
         
         return new Response(response.body, {

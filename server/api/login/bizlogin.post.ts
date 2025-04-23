@@ -31,6 +31,7 @@ export default defineEventHandler(async (event) => {
     const parsedCookies = parseCookies(cookies)
 
     const _body = await response.json()
+    
     const _token = new URL(`http://localhost${_body.redirect_url}`).searchParams.get('token')
     const _cookie: string[] = []
     Object.keys(parsedCookies).forEach(key => {
@@ -117,30 +118,25 @@ function parseCookies (cookies: string[]): Record<string, CookieItem> {
     const result: Record<string, CookieItem> = {}
     
     for (const cookie of cookies) {
-        // 分割多个cookie
-        const cookiePairs = cookie.split(',').map(c => c.trim())
-        
-        for (const cookieStr of cookiePairs) {
-            const parts = cookieStr.split(';').map(v => v.trim())
-            const [name, value] = parts[0].split('=')
-            const other = parts.slice(1).map(v => v.toLowerCase())
+      const parts = cookie.split(';').map(v => v.trim())
+      const [name, value] = parts[0].split('=')
+      const other = parts.slice(1).map(v => v.toLowerCase())
 
-            const pathPart = other.find(part => part.startsWith('path='))
-            const expirePart = other.find(part => part.startsWith('expires='))
-            const domainPart = other.find(part => part.startsWith('domain='))
-            const maxAgePart = other.find(part => part.startsWith('max-age='))
-            
-            result[name] = {
-                name: name,
-                value: decodeURIComponent(value),
-                path: pathPart?.split('=')[1] || '/',
-                expires: expirePart?.split('=')[1] || '',
-                domain: domainPart?.split('=')[1] || '',
-                maxAge: maxAgePart ? parseInt(maxAgePart.split('=')[1]) : undefined,
-                secure: other.includes('secure'),
-                httpOnly: other.includes('httponly'),
-            }
-        }
+      const pathPart = other.find(part => part.startsWith('path='))
+      const expirePart = other.find(part => part.startsWith('expires='))
+      const domainPart = other.find(part => part.startsWith('domain='))
+      const maxAgePart = other.find(part => part.startsWith('max-age='))
+      
+      result[name] = {
+          name: name,
+          value: decodeURIComponent(value),
+          path: pathPart?.split('=')[1] || '/',
+          expires: expirePart?.split('=')[1] || '',
+          domain: domainPart?.split('=')[1] || '',
+          maxAge: maxAgePart ? parseInt(maxAgePart.split('=')[1]) : undefined,
+          secure: other.includes('secure'),
+          httpOnly: other.includes('httponly'),
+      }
     }
     return result
 }
