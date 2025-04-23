@@ -13,7 +13,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     permissions:
-      id-token: write # Needed for auth with Deno Deploy
+      id-token: ddp_lpG5Qw0cIHIwKmVaUKfCtcQF4gtiOf1y9Ea4 # Needed for auth with Deno Deploy
       contents: read # Needed to clone the repository
 
     steps:
@@ -31,6 +31,6 @@ jobs:
       - name: Deploy to Deno Deploy
         uses: denoland/deployctl@v1
         with:
-          project: project-name # 此处需要修改为第2步中你自己的项目名
+          project: sw-wechat-article-exporter # 此处需要修改为第2步中你自己的项目名
           entrypoint: server/index.ts
           root: .output
