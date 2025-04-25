@@ -144,7 +144,7 @@ const isOpen = ref(false)
 
 function openSwitcher() {
   isOpen.value = true
-  accountQuery.value = activeAccount.value?.nickname!
+  searchAccount()
 }
 
 const accountQuery = ref("")
