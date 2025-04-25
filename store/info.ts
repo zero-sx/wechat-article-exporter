@@ -11,6 +11,10 @@ export interface Info {
     nickname?: string
     // 公众号头像
     round_head_img?: string
+    alias: string | null
+    service_type: number | null
+    signature: string | null
+    verify_status: number | null
 }
 
 /**
@@ -39,6 +43,10 @@ export async function updateInfoCache(infoStore: IDBObjectStore, info: Info): Pr
                     articles: info.articles,
                     nickname: info.nickname,
                     round_head_img: info.round_head_img,
+                    alias: info.alias,
+                    service_type: info.service_type,
+                    signature: info.signature,
+                    verify_status: info.verify_status,
                 }
             }
 

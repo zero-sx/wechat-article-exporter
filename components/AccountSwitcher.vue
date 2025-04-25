@@ -3,7 +3,7 @@
     <div
         class="rounded-lg divide-y divide-gray-100 dark:divide-gray-800 shadow bg-white dark:bg-gray-900 flex flex-col flex-1 overflow-y-scroll">
       <div class="sticky top-0 bg-white py-4 px-2 shadow">
-        <BaseSearch v-model="accountQuery" @search="searchAccount" required placeholder="搜索公众号名称或biz号码"/>
+        <BaseSearch v-model="accountQuery" @search="searchAccount" placeholder="搜索公众号名称或biz号码"/>
       </div>
       <div class="flex-1">
         <ul class="divide-y antialiased">
@@ -13,14 +13,14 @@
               :class="{active: account.fakeid === activeAccount?.fakeid}"
               @click="selectAccount(account)"
           >
-            <img v-if="account.type !== 'author'" class="size-20 mr-2" :src="account.round_head_img" alt="">
+            <img class="size-20 mr-2" :src="account.round_head_img" alt="">
             <div class="flex-1">
               <div class="flex justify-between">
                 <p class="font-semibold">{{ account.nickname }}</p>
-                <p v-if="account.type !== 'author'" class="text-sky-500 font-medium">{{ ACCOUNT_TYPE[account.service_type] }}</p>
+                <p class="text-sky-500 font-medium">{{ ACCOUNT_TYPE[account.service_type] }}</p>
               </div>
-              <p v-if="account.type !== 'author'" class="text-gray-500 text-sm">微信号: {{ account.alias || '未设置' }}</p>
-              <p v-if="account.type !== 'author'" class="text-sm mt-2">{{ account.signature }}</p>
+              <p class="text-gray-500 text-sm">微信号: {{ account.alias || '未设置' }}</p>
+              <p class="text-sm mt-2">{{ account.signature }}</p>
             </div>
           </li>
         </ul>
@@ -48,6 +48,7 @@ import {Loader} from "lucide-vue-next";
 import type {AccountInfo, AuthorInfo} from "~/types/types";
 import {getAccountList} from "~/apis";
 import {authorInfo} from "~/apis";
+import { getAllInfo, type Info } from "~/store/info"
 
 const loginAccount = useLoginAccount()
 const activeAccount = useActiveAccount()
@@ -62,15 +63,11 @@ const isOpen = ref(false)
 
 function openSwitcher() {
   isOpen.value = true
-  if (activeAccount.value?.type === 'author') {
-    accountQuery.value = activeAccount.value?.fakeid!
-  } else {
-    accountQuery.value = activeAccount.value?.nickname!
-  }
+  accountQuery.value = activeAccount.value?.nickname!
 }
 
 const accountQuery = ref('')
-const accountList = reactive<(AccountInfo | AuthorInfo)[]>([])
+const accountList = reactive<(AccountInfo)[]>([])
 let begin = 0
 
 
@@ -82,16 +79,32 @@ async function searchAccount() {
   accountList.length = 0
   noMoreData.value = false
 
-  if (/^[a-z0-9]+==$/i.test(accountQuery.value)) {
-    // 直接输入的bizNo
-    await loadAuthorInfo(accountQuery.value)
-  } else {
-    await loadData()
-  }
+  await loadData()
 }
 
 const loading = ref(false)
 const noMoreData = ref(false)
+
+
+// 已缓存的公众号信息
+let cachedAccountInfos = await getAllInfo()
+// 为了避免类型不匹配问题，这里先不指定 ComputedRef 的泛型类型，让类型推导自动处理
+const sortedAccountInfos = computed(() => {
+  cachedAccountInfos.sort((a, b) => {
+    return a.articles > b.articles ? -1 : 1
+  })
+  return cachedAccountInfos.map((row) => {
+    return {
+      type: 'account',
+      alias: row.alias,
+      fakeid: row.fakeid,
+      nickname: row.nickname,
+      round_head_img: row.round_head_img,
+      service_type: row.service_type,
+      signature: row.signature,
+    }
+  })
+})
 
 /**
  * 加载公众号数据
@@ -100,10 +113,21 @@ async function loadData() {
   loading.value = true
 
   try {
-    const [accounts, completed] = await getAccountList(loginAccount.value.token, begin, accountQuery.value)
-    accountList.push(...accounts)
+    let finalAccounts: AccountInfo[] = []
+    let finalCompleted = false
+    if (!accountQuery.value) {
+      cachedAccountInfos = await getAllInfo()
+      // 由于类型不匹配，进行类型断言以解决类型错误
+      finalAccounts = sortedAccountInfos.value as AccountInfo[];
+      finalCompleted = true
+    } else {
+      let [accounts, completed] = await getAccountList(loginAccount.value.token, begin, accountQuery.value)
+      finalAccounts = accounts
+      finalCompleted = completed
+    }
+    accountList.push(...finalAccounts)
     begin += ACCOUNT_LIST_PAGE_SIZE
-    noMoreData.value = completed
+    noMoreData.value = finalCompleted
   } catch (e: any) {
     alert(e.message)
     console.error(e)
@@ -115,35 +139,14 @@ async function loadData() {
   }
 }
 
-async function loadAuthorInfo(biz: string) {
-  loading.value = true
-
-  try {
-    const result = await authorInfo(accountQuery.value)
-    if (result.base_resp.ret === 0) {
-      accountList.push({
-        type: 'author',
-        fakeid: biz,
-        nickname: result.identity_name,
-      })
-    }
-    noMoreData.value = true
-  } catch (e: any) {
-    alert(e.message)
-    console.error(e)
-  } finally {
-    loading.value = false
-  }
-}
-
 /**
  * 选择公众号
  * @param account
  */
-function selectAccount(account: AccountInfo | AuthorInfo) {
+function selectAccount(account: AccountInfo) {
   isOpen.value = false
   activeAccount.value = account
-
+  
   nextTick(() => {
     emit('select:account', account)
   })

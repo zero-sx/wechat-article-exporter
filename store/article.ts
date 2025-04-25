@@ -68,14 +68,19 @@ export async function updateArticleCache(publishList: PublishListItem[], complet
             msgCount++
         }
     }
-
+    console.log(activeAccount.value);
+    
     await updateInfoCache(infoStore, {
         fakeid: fakeid,
         completed: completed,
         count: msgCount,
         articles: articleCount,
         nickname: activeAccount.value?.nickname,
-        round_head_img: activeAccount.value?.type === 'author' ? undefined : activeAccount.value?.round_head_img,
+        round_head_img: activeAccount.value?.round_head_img,
+        alias: activeAccount.value?.alias || "",
+        service_type: activeAccount.value?.service_type || null,
+        signature: activeAccount.value?.signature || null,
+        verify_status: activeAccount.value?.verify_status || null,
     })
 }
 

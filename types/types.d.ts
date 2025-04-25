@@ -38,6 +38,7 @@ export interface AccountInfo {
     service_type: number
     signature: string
     _loaded?: boolean
+    verify_status: number
 }
 
 export interface AuthorInfo {
