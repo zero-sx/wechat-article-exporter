@@ -68,7 +68,6 @@ export async function updateArticleCache(publishList: PublishListItem[], complet
             msgCount++
         }
     }
-    console.log(activeAccount.value);
     
     await updateInfoCache(infoStore, {
         fakeid: fakeid,
