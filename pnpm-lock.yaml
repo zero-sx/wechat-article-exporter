@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@antfu/utils':
+    specifier: ^9.2.0
+    version: 9.2.0
   '@iconify-json/heroicons-solid':
     specifier: ^1.1.11
     version: 1.2.1
@@ -112,6 +115,10 @@ packages:
 
   /@antfu/utils@8.1.1:
     resolution: {integrity: sha512-Mex9nXf9vR6AhcXmMrlz/HVgYYZpVGJ6YlPgwl7UnaFpnshXs6EK/oa5Gpf3CzENMjkvEx2tQtntGnb7UtSTOQ==}
+    dev: false
+
+  /@antfu/utils@9.2.0:
+    resolution: {integrity: sha512-Oq1d9BGZakE/FyoEtcNeSwM7MpDO2vUBi11RWBZXf75zPsbUVWmUs03EqkRFrcgbXyKTas0BdZWC1wcuSoqSAw==}
     dev: false
 
   /@babel/code-frame@7.26.2:

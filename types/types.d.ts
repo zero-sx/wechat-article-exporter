@@ -172,3 +172,26 @@ export interface LogoutResponse {
     statusCode: number
     statusText: string
 }
+
+export interface Album {
+  id?: string,
+  title: string,
+  size: number | null,
+  link?: string,
+  type?: number,
+  continousReadOn?: number
+}
+export interface Article {
+  url: string,
+  accountName: string,
+  title: string,
+  description: string,
+  author: string,
+  copyright: string,
+  originContent: string,
+  content: string,
+  cover: string,
+  publishTime: string,
+  readNum: number
+  albumList: Album[]
+}

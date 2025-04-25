@@ -21,6 +21,7 @@
     "stat": "deno run -A --unstable-kv scripts/stat.ts"
   },
   "dependencies": {
+    "@antfu/utils": "^9.2.0",
     "@iconify-json/heroicons-solid": "^1.1.11",
     "@nuxt/icon": "^1.3.1",
     "@nuxt/ui": "^2.17.0",
